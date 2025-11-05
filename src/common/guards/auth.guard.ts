@@ -1,4 +1,4 @@
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, UnauthorizedException, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { CustomerRepository } from 'src/models/customer/customer.repository';
@@ -19,23 +19,27 @@ export class AuthGuard implements CanActivate {
     async canActivate(
         context: ExecutionContext,
     ): Promise<boolean> {
-        const request = context.switchToHttp().getRequest();
+        try {
+            const request = context.switchToHttp().getRequest();
 
-        const token = request.headers.authorization
+            const token = request.headers.authorization
 
-        const payload = this.jwtService.verify<IPayload>(token, { secret: this.configService.get("jwt_secret") })
+            const payload = this.jwtService.verify<IPayload>(token, { secret: this.configService.get("jwt_secret") })
 
-        const customer = await this.customerRepository.getById(payload._id)
+            const customer = await this.customerRepository.getById(payload._id)
 
-        if (!customer) {
-            throw new UnauthorizedException("invaliid token")
+            if (!customer) {
+                throw new UnauthorizedException("invalid token")
+            }
+
+            if (customer.token != token) {
+                throw new UnauthorizedException("invalid token")
+            }
+
+            request.user = customer
+            return true;
+        } catch (error) {
+            throw new InternalServerErrorException(error.message)
         }
-
-        if (customer.token != token) {
-            throw new UnauthorizedException("invaliid token")
-        }
-
-        request.user = customer
-        return true;
     }
 }

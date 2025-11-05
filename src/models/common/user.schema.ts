@@ -32,6 +32,9 @@ export class User {
 
     @Prop({ type: String })
     token: string
+
+    @Prop({ type: String, enum: ["local", "google"], default: "local" })
+    agent: string
 }
 
 export const userSchema = SchemaFactory.createForClass(User)

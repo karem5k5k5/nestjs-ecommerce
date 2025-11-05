@@ -24,15 +24,13 @@ export class AuthService {
       throw new ConflictException("user already exists")
     }
 
-    const createdCustomer = await this.customerRepository.create(customer)
+    await this.customerRepository.create(customer)
 
     await sendmail({
       to: customer.email,
       subject: "Verify Email",
       html: `<p>your otp to verify email is <b>${customer.otp}</b></p>`
     })
-
-    return createdCustomer
   }
 
   async login(loginDTO: LoginDTO) {
@@ -53,7 +51,7 @@ export class AuthService {
     }
 
     // generate token
-    const token = this.jwtService.sign({ _id: userExist._id, role: "Customer", email: userExist.email }, { secret: this.configService.get("jwt_secret"), expiresIn: "24h" })
+    const token = this.jwtService.sign({ _id: userExist._id, email: userExist.email }, { secret: this.configService.get("jwt_secret"), expiresIn: "24h" })
 
     await this.userRepository.updateOne({ email: userExist.email }, { token })
 
