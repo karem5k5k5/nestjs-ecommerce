@@ -11,6 +11,7 @@ export class Customer {
     otp: string
     otpExpiry: Date
     token: string
+    agent:string
 
     @Prop({ type: String })
     address: string

@@ -11,6 +11,7 @@ export class Seller {
     otp: string
     otpExpiry: Date
     token: string
+    agent:string
 
     @Prop({ type: String })
     whatsappLink: string

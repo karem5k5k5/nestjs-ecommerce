@@ -11,6 +11,7 @@ export class Admin {
     otp: string
     otpExpiry: Date
     token: string
+    agent:string
 
     @Prop([{type:String}])
     permissions:string[]

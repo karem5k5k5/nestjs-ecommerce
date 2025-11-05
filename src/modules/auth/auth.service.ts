@@ -3,11 +3,12 @@ import { Customer } from './entities/auth.entity';
 import { ConfigService } from '@nestjs/config';
 import { CustomerRepository } from 'src/models/customer/customer.repository';
 import { sendmail } from 'src/common/utils/mail';
-import { ForgetPasswordDTO, LoginDTO, ResendOTPDTO, VerifyEmailDTO } from './dto';
+import { ForgetPasswordDTO, GoogleLoginDTO, LoginDTO, ResendOTPDTO, VerifyEmailDTO } from './dto';
 import { comparePassword, hashPassword } from 'src/common/utils/hash';
 import { JwtService } from '@nestjs/jwt';
 import { UserRepository } from 'src/models/common/user.repository';
 import { generateOTP } from 'src/common/utils/otp';
+import { OAuth2Client, TokenPayload } from 'google-auth-library';
 
 @Injectable()
 export class AuthService {
@@ -117,6 +118,28 @@ export class AuthService {
     const hashedPassword = await hashPassword(forgetPasswordDTO.newPassword)
 
     await this.userRepository.updateOne({ email: userExist.email }, { password: hashedPassword, otp: undefined, otpExpiry: undefined })
+  }
+
+  async googleLogin(googleLoginDTO: GoogleLoginDTO) {
+    const { idToken } = googleLoginDTO
+
+    const client = new OAuth2Client("475515404720-pvf8s4blqbk037papo8mi19alsoa6dm6.apps.googleusercontent.com")
+
+    const ticket = await client.verifyIdToken({ idToken })
+
+    const { name, email } = ticket.getPayload() as TokenPayload
+
+    let customer = await this.customerRepository.getOne({ email })
+
+    if (!customer) {
+      await this.customerRepository.create({ userName: name, email, agent: "google", isVerified: true })
+    }
+
+    // generate token
+    const token = this.jwtService.sign({ _id: customer?._id, email: customer?.email }, { secret: this.configService.get("jwt_secret"), expiresIn: "24h" })
+
+    return token
+
   }
 
 }

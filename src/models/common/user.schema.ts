@@ -17,7 +17,12 @@ export class User {
 
     @Prop({
         type: String,
-        required: true
+        required: function () {
+            if (this.agent == "local") {
+                return true
+            }
+            return false
+        }
     })
     password: string
 

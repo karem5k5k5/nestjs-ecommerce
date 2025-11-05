@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, HttpCode } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ForgetPasswordDTO, LoginDTO, RegisterDTO, ResendOTPDTO, VerifyEmailDTO } from './dto';
+import { ForgetPasswordDTO, GoogleLoginDTO, LoginDTO, RegisterDTO, ResendOTPDTO, VerifyEmailDTO } from './dto';
 import { AuthFactoryService } from './factory';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 
@@ -54,5 +54,12 @@ export class AuthController {
   async forgetPassword(@Body() forgetPasswordDTO: ForgetPasswordDTO) {
     await this.authService.forgetPassword(forgetPasswordDTO)
     return { success: true, message: "reset password successfully" }
+  }
+
+  @Post("google-login")
+  async googleLogin(@Body() googleLoginDTO: GoogleLoginDTO) {
+    const token = await this.authService.googleLogin(googleLoginDTO)
+
+    return { success: true, message: "login successfully", token }
   }
 }

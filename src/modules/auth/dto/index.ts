@@ -72,3 +72,9 @@ export class ForgetPasswordDTO {
     @IsNotEmpty()
     newPassword: string
 }
+
+export class GoogleLoginDTO{
+    @IsString()
+    @IsNotEmpty()
+    idToken:string
+}
