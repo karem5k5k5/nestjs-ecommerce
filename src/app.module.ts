@@ -5,6 +5,11 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import devConfig from './config/env/dev.config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { CategoryModule } from './modules/category/category.module';
+import { AuthGuard } from './common/guards/auth.guard';
+import { JwtService } from '@nestjs/jwt';
+import { BrandModule } from './modules/brand/brand.module';
+import { ProductModule } from './modules/product/product.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -17,7 +22,10 @@ import { MongooseModule } from '@nestjs/mongoose';
       uri: configService.get("db_url")
     })
   }),
-    AuthModule],
+    AuthModule,
+    CategoryModule,
+    BrandModule,
+    ProductModule],
   controllers: [AppController],
   providers: [AppService],
 })

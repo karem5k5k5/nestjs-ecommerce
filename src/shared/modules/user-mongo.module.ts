@@ -1,5 +1,7 @@
 import { Module } from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
 import { MongooseModule } from "@nestjs/mongoose";
+import { AuthGuard } from "src/common/guards/auth.guard";
 import { AdminRepository } from "src/models/admin/admin.repository";
 import { Admin, adminSchema } from "src/models/admin/admin.schema";
 import { UserRepository } from "src/models/common/user.repository";
@@ -19,9 +21,9 @@ import { Seller, sellerSchema } from "src/models/seller/seller.schema";
                     { name: Admin.name, schema: adminSchema }
                 ]
             }
-        ])
+        ]),
     ],
-    providers: [CustomerRepository, SellerRepository, UserRepository, AdminRepository],
-    exports: [CustomerRepository, SellerRepository, UserRepository, AdminRepository]
+    providers: [CustomerRepository, SellerRepository, UserRepository, AdminRepository,AuthGuard,JwtService],
+    exports: [CustomerRepository, SellerRepository, UserRepository, AdminRepository,AuthGuard,JwtService]
 })
 export class UserMongoModule { }

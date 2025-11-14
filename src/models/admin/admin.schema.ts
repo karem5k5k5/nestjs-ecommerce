@@ -13,8 +13,8 @@ export class Admin {
     token: string
     agent:string
 
-    @Prop([{type:String}])
-    permissions:string[]
+    @Prop({type:String})
+    adminSecretKey:string
 }
 
 export const adminSchema = SchemaFactory.createForClass(Admin)

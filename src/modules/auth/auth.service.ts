@@ -1,5 +1,5 @@
 import { ConflictException, ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { Customer } from './entities/auth.entity';
+import { Admin, Customer, Seller } from './entities/auth.entity';
 import { ConfigService } from '@nestjs/config';
 import { CustomerRepository } from 'src/models/customer/customer.repository';
 import { sendmail } from 'src/common/utils/mail';
@@ -9,12 +9,16 @@ import { JwtService } from '@nestjs/jwt';
 import { UserRepository } from 'src/models/common/user.repository';
 import { generateOTP } from 'src/common/utils/otp';
 import { OAuth2Client, TokenPayload } from 'google-auth-library';
+import { AdminRepository } from 'src/models/admin/admin.repository';
+import { SellerRepository } from 'src/models/seller/seller.repository';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly configService: ConfigService,
     private readonly customerRepository: CustomerRepository,
+    private readonly adminRepository:AdminRepository,
+    private readonly sellerRepository:SellerRepository,
     private readonly userRepository: UserRepository,
     private readonly jwtService: JwtService
   ) { }
@@ -31,6 +35,38 @@ export class AuthService {
       to: customer.email,
       subject: "Verify Email",
       html: `<p>your otp to verify email is <b>${customer.otp}</b></p>`
+    })
+  }
+
+  async registerSeller(seller: Seller) {
+    const sellerExist = await this.sellerRepository.getOne({ email: seller.email })
+
+    if (sellerExist) {
+      throw new ConflictException("user already exists")
+    }
+
+    await this.sellerRepository.create(seller)
+
+    await sendmail({
+      to: seller.email,
+      subject: "Verify Email",
+      html: `<p>your otp to verify email is <b>${seller.otp}</b></p>`
+    })
+  }
+
+  async registerAdmin(admin: Admin) {
+    const adminExist = await this.adminRepository.getOne({ email: admin.email })
+
+    if (adminExist) {
+      throw new ConflictException("user already exists")
+    }
+
+    await this.adminRepository.create(admin)
+
+    await sendmail({
+      to: admin.email,
+      subject: "Verify Email",
+      html: `<p>your otp to verify email is <b>${admin.otp}</b></p>`
     })
   }
 

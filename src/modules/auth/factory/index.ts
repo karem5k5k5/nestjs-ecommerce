@@ -1,6 +1,6 @@
 import { hashPassword } from "src/common/utils/hash";
-import { RegisterDTO } from "../dto";
-import { Customer } from "../entities/auth.entity";
+import { RegisterAdminDTO, RegisterDTO, RegisterSellerDTO } from "../dto";
+import { Admin, Customer, Seller } from "../entities/auth.entity";
 import { generateOTP } from "src/common/utils/otp";
 
 export class AuthFactoryService {
@@ -17,5 +17,33 @@ export class AuthFactoryService {
         customer.token = ""
 
         return customer
+    }
+
+    async createAdmin(registerAdminDTO: RegisterAdminDTO) {
+        const admin = new Admin()
+
+        admin.userName = registerAdminDTO.userName
+        admin.email = registerAdminDTO.email
+        admin.password = await hashPassword(registerAdminDTO.password)
+        admin.adminSecret = registerAdminDTO.adminSecret
+        admin.otp = generateOTP()
+        admin.otpExpiry = new Date(Date.now() + 5 * 60 * 1000)
+        admin.token = ""
+
+        return admin
+    }
+
+    async createSeller(registerSellerDTO: RegisterSellerDTO) {
+        const seller = new Seller()
+
+        seller.userName = registerSellerDTO.userName
+        seller.email = registerSellerDTO.email
+        seller.password = await hashPassword(registerSellerDTO.password)
+        seller.whatsappLink = registerSellerDTO.whatsappLink
+        seller.otp = generateOTP()
+        seller.otpExpiry = new Date(Date.now() + 5 * 60 * 1000)
+        seller.token = ""
+
+        return seller
     }
 }

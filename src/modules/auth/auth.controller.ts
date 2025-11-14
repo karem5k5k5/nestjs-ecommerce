@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, HttpCode } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ForgetPasswordDTO, GoogleLoginDTO, LoginDTO, RegisterDTO, ResendOTPDTO, VerifyEmailDTO } from './dto';
+import { ForgetPasswordDTO, GoogleLoginDTO, LoginDTO, RegisterAdminDTO, RegisterDTO, RegisterSellerDTO, ResendOTPDTO, VerifyEmailDTO } from './dto';
 import { AuthFactoryService } from './factory';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 
@@ -16,6 +16,24 @@ export class AuthController {
     await this.authService.register(customer)
 
     return { success: true, message: "customer registered successfully" }
+  }
+
+  @Post('register-seller')
+  async registerSeller(@Body() registerSellerDTO: RegisterSellerDTO) {
+    const seller = await this.authFactoryService.createSeller(registerSellerDTO)
+
+    await this.authService.registerSeller(seller)
+
+    return { success: true, message: "seller registered successfully" }
+  }
+
+  @Post('register-admin')
+  async registerAdmin(@Body() registerAdminDTO: RegisterAdminDTO) {
+    const admin = await this.authFactoryService.createAdmin(registerAdminDTO)
+
+    await this.authService.registerAdmin(admin)
+
+    return { success: true, message: "admin registered successfully" }
   }
 
   @Post('login')
